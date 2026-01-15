@@ -10,3 +10,5 @@ Initial exploratory analysis
 Explicit division of responsibilities within the group
 
 GitHub repository with a clear README and early commits
+
+👥 Authors: Nami Barsbold Bouchra Daddaoui Amanda Gonzalez Mejia
