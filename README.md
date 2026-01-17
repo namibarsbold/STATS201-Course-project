@@ -11,7 +11,7 @@ Explicit division of responsibilities within the group
 
 GitHub repository with a clear README and early commits
 
-# Week 2 
+## Week 2 
 
 ### Research Question
 Can nighttime satellite imagery be used to classify countries as energy-stable or energy-insecure?
