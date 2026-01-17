@@ -32,9 +32,9 @@ These patterns confirm strong cross-country heterogeneity and motivate the use o
 The machine learning task of this project is to classify countries as energy-stable or energy-insecure using features derived from nighttime satellite imagery.
 
 For Week 2, no models are trained. The annual dataset is used only to:
-- validate feature construction
-- inspect distributions and outliers
-- confirm feasibility for classification
+validate feature construction
+inspect distributions and outliers
+confirm feasibility for classification
 
 In later stages, monthly country–month VIIRS data will be used to construct country-level time-series features capturing temporal variability and persistence. These features will be used in a supervised binary classification framework, with a secondary regression task used for robustness.
 
