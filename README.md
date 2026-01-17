@@ -4,17 +4,9 @@ Satellite-derived nighttime lights have become a widely used proxy for electrici
 
 Project Question: Can Changes in Nighttime Satellite Images Reveal Energy Insecurity?
 
-Tasks:
-Clearly stated research question and ML task
-
-Dataset description and feasibility assessment
-
-Initial exploratory analysis
-
-Explicit division of responsibilities within the group
-
-GitHub repository with a clear README and early commits
-
+This project uses VIIRS Day/Night Band nighttime lights data from NOAA/NASA. 
+The data capture nighttime radiance associated with artificial lighting and electricity use. 
+Monthly cloud-free composites with global coverage since 2012 are used at ~500 m resolution.
 ## Week 2 
 
 ### Research Question
