@@ -19,7 +19,7 @@ Can nighttime satellite imagery be used to classify countries as energy-stable o
 ### Data
 This project uses VIIRS Day/Night Band nighttime lights data provided by NOAA/NASA(2012-2023) 
 
-## Exploratory Analysis
+### Exploratory Analysis
 Exploratory analysis focuses on the distribution and scale of extracted features.  
 Mean radiance is highly right-skewed, with a small number of very bright country–years and a large mass of low-light observations. Spatial variability also varies widely across countries and is not perfectly aligned with mean brightness.
 These patterns confirm strong cross-country heterogeneity and motivate the use of variability-based features rather than average brightness alone.
