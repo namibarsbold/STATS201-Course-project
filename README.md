@@ -19,19 +19,24 @@ Can nighttime satellite imagery be used to classify countries as energy-stable o
 ### Data
 This project uses VIIRS Day/Night Band nighttime lights data provided by NOAA/NASA(2012-2023) 
 
-For Week 2, I used only country-level annual summaries (2022–2024) derived in Google Earth Engine.
+## Exploratory Analysis
+Exploratory analysis focuses on the distribution and scale of extracted features.  
+Mean radiance is highly right-skewed, with a small number of very bright country–years and a large mass of low-light observations. Spatial variability also varies widely across countries and is not perfectly aligned with mean brightness.
+These patterns confirm strong cross-country heterogeneity and motivate the use of variability-based features rather than average brightness alone.
 
-### Initial Exploratory Analysis
-I compute three features per country–year:
-- mean nighttime radiance
-- within-country spatial variability
-- total summed radiance
+### Machine Learning Task
+The machine learning task of this project is to classify countries as energy-stable or energy-insecure using features derived from nighttime satellite imagery.
 
-Exploratory analysis shows strong cross-country heterogeneity and a weakly structured relationship between average brightness and spatial variability, motivating a feature-based machine learning approach.
+For Week 2, no models are trained. The annual dataset is used only to:
+- validate feature construction
+- inspect distributions and outliers
+- confirm feasibility for classification
+
+In later stages, monthly country–month VIIRS data will be used to construct country-level time-series features capturing temporal variability and persistence. These features will be used in a supervised binary classification framework, with a secondary regression task used for robustness.
 
 ### Status
-Week 2 focuses on data construction, initial exploratory analysis, and ML task definition. 
-Monthly country–month csv file data have been generated for use in later stages.
+Week 2 focuses on data construction, exploratory analysis, and ML task definition.  
+Monthly country–month data have been generated and will be used in subsequent weeks.
 
 
-👥 Authors: Nami Barsbold Bouchra Daddaoui Amanda Gonzalez Mejia
+Authors: Nami, Bouchra, Amanda 
