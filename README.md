@@ -1,5 +1,7 @@
 # STATS201-Course-project
-Question: Can Changes in Nighttime Satellite Images Reveal Energy Insecurity
+Satellite-derived nighttime lights have become a widely used proxy for electricity access and energy system performance in the Global South, where administrative and survey-based data are often incomplete or unreliable. Recent peer-reviewed studies show that brightness levels and temporal changes in nighttime lights are strongly associated with household electrification, grid expansion, and large-scale disruptions to electricity supply (Zhao et al. 2021; Chen et al. 2022). Building on earlier work that linked nightlights to economic activity, newer research increasingly emphasizes temporal variability in brightness as a signal of electricity reliability rather than access alone, particularly in low- and middle-income countries (Gibson et al. 2023).
+Question: Can Changes in Nighttime Satellite Images Reveal Energy Insecurity?
+
 Tasks:
 Clearly stated research question and ML task
 
