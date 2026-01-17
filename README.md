@@ -17,8 +17,9 @@ GitHub repository with a clear README and early commits
 Can nighttime satellite imagery be used to classify countries as energy-stable or energy-insecure?
 
 ### Data
-This project uses VIIRS Day/Night Band nighttime lights data provided by NOAA/NASA. 
-For Week 2, I use country-level annual summaries (2022–2024) derived in Google Earth Engine.
+This project uses VIIRS Day/Night Band nighttime lights data provided by NOAA/NASA(2012-2023) 
+
+For Week 2, I used only country-level annual summaries (2022–2024) derived in Google Earth Engine.
 
 ### Initial Exploratory Analysis
 I compute three features per country–year:
