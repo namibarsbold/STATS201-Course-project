@@ -40,11 +40,9 @@ Week 3 focuses on implementing an initial baseline model to evaluate whether sim
 ### Baseline Model
 
 We implement a supervised binary classification model using logistic regression. Each observation corresponds to a country–year and is represented by two features derived from VIIRS nighttime lights:
-
-Mean radiance, capturing overall brightness levels
-
-Spatial variability (standard deviation) of radiance, capturing heterogeneity in nighttime illumination
-
+- Mean radiance, capturing overall brightness levels
+- Spatial variability (standard deviation) of radiance, capturing heterogeneity in nighttime illumination
+  
 Countries are assigned to a baseline “stable” or “variable” class using a median split on spatial variability, which serves as a latent proxy for electricity stability. These labels are used solely for exploratory classification and do not represent observed ground truth.
 
 ### Train/Test Split
