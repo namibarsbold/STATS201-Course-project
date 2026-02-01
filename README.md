@@ -3,37 +3,37 @@ Satellite-derived nighttime lights have become a widely used proxy for electrici
 
 Most existing studies focus on estimating electricity access levels or tracking long-run electrification progress. Fewer papers examine whether patterns in nightlight variability over time can be used to distinguish broadly stable from unstable electricity systems in a comparative, cross-country framework. This project builds on the established use of nighttime lights as an energy proxy while addressing this gap. Specifically, we ask whether patterns in nighttime satellite images can distinguish countries with relatively stable versus variable electricity-related lighting over time. We analyze monthly nighttime satellite imagery to construct country-level time series of light intensity and extract summary measures of temporal variability. Using a binary classification framework, we assess whether these patterns differ systematically across countries, without attributing observed differences to specific causes.
 
-## Week 3: Baseline Model and Initial Results
+## Week 4: Temporal Features, Forecasting, and Model Comparison
+
 ### Objective
 
-Week 3 focuses on implementing an initial baseline model to evaluate whether simple satellite-derived features from nighttime lights contain informative signals related to electricity system stability. This stage is intended as a diagnostic benchmark rather than a finalized modeling approach.
+Week 4 extends the baseline analysis by addressing key limitations identified in Week 3, particularly label circularity and the lack of temporal structure. The goal is to reformulate the task as a forecasting problem and to evaluate whether richer temporal representations of nighttime lights improve predictive performance.
 
-### Baseline Model
+### Data and Feature Engineering
 
-We implement a supervised binary classification model using logistic regression. Each observation corresponds to a country–year and is represented by two features derived from VIIRS nighttime lights:
-- Mean radiance, capturing overall brightness levels
-- Spatial variability (standard deviation) of radiance, capturing heterogeneity in nighttime illumination
-  
-Countries are assigned to a baseline “stable” or “variable” class using a median split on spatial variability, which serves as a latent proxy for electricity stability. These labels are used solely for exploratory classification and do not represent observed ground truth.
+We construct a monthly country-level panel using VIIRS nighttime lights data accessed through Google Earth Engine. Monthly radiance values are aggregated into yearly country-level features, including mean, standard deviation, minimum, maximum, and range of monthly brightness. These features summarize both average illumination levels and temporal volatility within a year.
 
-### Train/Test Split
+To avoid circularity, labels are defined using *next-year* volatility: features are computed from Year *t*, while the binary outcome indicates whether volatility in Year *t+1* exceeds the sample median. This transforms the task from descriptive classification into a genuine one-year-ahead forecasting problem.
 
-The dataset is split into training (70%) and test (30%) sets using a stratified random split to preserve class balance across subsets. This hold-out validation framework allows model performance to be evaluated on unseen observations while remaining simple and interpretable for a baseline analysis.
+### Model Comparison and Controlled Experiments
 
-### Evaluation Strategy
+We compare Logistic Regression and Random Forest classifiers to evaluate the role of model flexibility in capturing instability patterns. Logistic Regression serves as a linear baseline, while Random Forest allows for non-linear interactions and threshold effects.
 
-Model performance is evaluated using overall classification accuracy as the primary metric, supplemented by a confusion matrix to examine class-specific prediction patterns. This evaluation strategy is appropriate for a binary classification task with balanced classes and provides a transparent reference point for future model comparisons.
+Controlled experiments are conducted using incrementally expanded feature sets:
+- Minimal temporal summaries (mean and standard deviation)
+- Temporal summaries plus extrema and range
+- Optional spatial heterogeneity measures
+- Optional external infrastructure covariates
 
-### Initial Results
+All models are evaluated using a stratified 70/30 train–test split, with performance assessed via accuracy and class-specific F1 scores, focusing on the unstable class.
 
-The baseline logistic regression model achieves an accuracy of approximately 86% on the held-out test set. Visualization of the feature space indicates that spatial variability in nighttime radiance provides clearer separation between classes than mean radiance alone. The confusion matrix shows that the model performs better at identifying relatively stable countries, while misclassification occurs more frequently among variable countries.
+### Key Findings
 
-### Interpretation and Next Steps
-
-These results suggest that even simplified spatial summaries of nighttime lights contain meaningful information related to electricity system stability. At the same time, the asymmetry in classification performance highlights the heterogeneous nature of energy instability and the limitations of static, annual features. In subsequent weeks, the project will incorporate monthly country–month observations and richer temporal features to better capture persistence, volatility, and change in nighttime illumination patterns.
+Random Forest models consistently outperform Logistic Regression, particularly when extreme and range-based temporal features are included. Performance gains are driven primarily by volatility-related features rather than average brightness levels. External infrastructure covariates do not materially improve performance beyond satellite-derived features. These results suggest that fluctuations in nighttime illumination provide a meaningful early-warning signal for future electricity grid instability.
 
 ### Status
-Week 3 implements an initial baseline classification model and evaluation framework.  
-A logistic regression model is used to establish a benchmark for distinguishing energy-stable and energy-variable countries using annual VIIRS-derived features. Results highlight the informativeness of variability-based features and motivate the incorporation of richer temporal representations in subsequent weeks.
+
+Weeks 4 establish a complete modeling pipeline for forecasting electricity grid instability using satellite-derived nighttime lights. The project now includes monthly data aggregation, temporally informed feature engineering, a non-circular label definition based on next-year volatility, and systematic model comparison through controlled experiments. Results indicate that temporal variability and extreme fluctuations in nighttime lights are more informative than static brightness levels, providing a strong foundation for further validation and extension.
+
 
 Authors: Nami, Bouchra, Amanda 
