@@ -1,0 +1,109 @@
+import os
+import numpy as np
+import pandas as pd
+
+INPUT_CSV = r"data/combined/viirs_monthly_country_2012_2024.csv"
+OUT_CSV   = r"data/combined/ml_country_dataset_features_label.csv"
+
+PAST_START, PAST_END   = "2012-01-01", "2018-12-01"
+FUT_START,  FUT_END    = "2019-01-01", "2024-05-01"
+
+LABEL_Q = 0.70  # top 30% = "unstable" (change to 0.5 for median split)
+
+def safe_datetime(df):
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    return df
+
+def add_logmean(df):
+    df["mean"] = pd.to_numeric(df["mean"], errors="coerce")
+    df["logmean"] = np.log1p(df["mean"])
+    return df
+
+def slope_time(y):
+    # slope of y over time index (simple linear slope)
+    if len(y) < 6:
+        return np.nan
+    x = np.arange(len(y))
+    return np.polyfit(x, y, 1)[0]
+
+def acf1(y):
+    # lag-1 autocorrelation
+    if len(y) < 6:
+        return np.nan
+    y0 = y[:-1]
+    y1 = y[1:]
+    if np.std(y0) == 0 or np.std(y1) == 0:
+        return 0.0
+    return np.corrcoef(y0, y1)[0, 1]
+
+def make_country_features(df_window):
+    """
+    Input: df filtered to a time window
+    Output: per-country feature table
+    """
+    feats = []
+    for country, g in df_window.groupby("country"):
+        g = g.sort_values("date").copy()
+        y = g["logmean"].values
+        dy = np.diff(y)
+
+        feat = {
+            "country": country,
+            "n_months": len(g),
+            "missing_rate_mean": g["mean"].isna().mean(),
+            "avg_cloudFree": pd.to_numeric(g.get("cloudFree"), errors="coerce").mean(),
+            "level_mean_logmean": np.nanmean(y),
+            "level_median_logmean": np.nanmedian(y),
+            "trend_slope_logmean": slope_time(pd.Series(y).dropna().values),
+            "persistence_acf1": acf1(pd.Series(y).dropna().values),
+            # month-to-month volatility
+            "volatility_std_dlogmean": np.nanstd(dy) if len(dy) > 0 else np.nan,
+            # dispersion within a month (spatial): use std column if exists
+            "avg_spatial_std": pd.to_numeric(g.get("std"), errors="coerce").mean(),
+        }
+        feats.append(feat)
+    return pd.DataFrame(feats)
+
+def main():
+    if not os.path.exists(INPUT_CSV):
+        raise FileNotFoundError(f"Missing input: {INPUT_CSV}")
+
+    df = pd.read_csv(INPUT_CSV)
+    df = safe_datetime(df)
+    df = add_logmean(df)
+
+    # split into past/future windows
+    past = df[(df["date"] >= PAST_START) & (df["date"] <= PAST_END)].copy()
+    fut  = df[(df["date"] >= FUT_START)  & (df["date"] <= FUT_END)].copy()
+
+    # country-level features from past
+    X = make_country_features(past)
+
+    # future volatility for label
+    y_table = make_country_features(fut)[["country", "volatility_std_dlogmean"]].rename(
+        columns={"volatility_std_dlogmean": "future_volatility"}
+    )
+
+    ml = X.merge(y_table, on="country", how="inner")
+
+    # define binary label from future volatility quantile
+    thr = ml["future_volatility"].quantile(LABEL_Q)
+    ml["label_energy_insecure"] = (ml["future_volatility"] >= thr).astype(int)
+
+    # save
+    os.makedirs(os.path.dirname(OUT_CSV), exist_ok=True)
+    ml.to_csv(OUT_CSV, index=False)
+
+    print("=== ML DATASET (COUNTRY-LEVEL) ===")
+    print("Saved:", OUT_CSV)
+    print("Countries:", ml.shape[0])
+    print("Past window:", PAST_START, "->", PAST_END)
+    print("Future window:", FUT_START, "->", FUT_END)
+    print("Label threshold (future volatility quantile):", LABEL_Q)
+    print("Label counts:\n", ml["label_energy_insecure"].value_counts())
+
+    print("\nPreview columns:\n", list(ml.columns))
+    print("\nHead:\n", ml.head(5))
+
+if __name__ == "__main__":
+    main()
