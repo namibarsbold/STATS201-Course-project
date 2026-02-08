@@ -4,57 +4,62 @@ Satellite-derived nighttime lights have become a widely used proxy for electrici
 Most existing studies focus on estimating electricity access levels or tracking long-run electrification progress. Fewer papers examine whether patterns in nightlight variability over time can be used to distinguish broadly stable from unstable electricity systems in a comparative, cross-country framework. This project builds on the established use of nighttime lights as an energy proxy while addressing this gap. Specifically, we ask whether patterns in nighttime satellite images can distinguish countries with relatively stable versus variable electricity-related lighting over time. We analyze monthly nighttime satellite imagery to construct country-level time series of light intensity and extract summary measures of temporal variability. Using a binary classification framework, we assess whether these patterns differ systematically across countries, without attributing observed differences to specific causes.
 
 
-## Week 5 :  Robustness and sensitivity checks
+WEEK 5 REPORT:
 
-Image-Based Feature Engineering
+Reformulation of the Prediction Task
 
-This week focuses on incorporating satellite image data as a robustness check and diagnostic tool for the project. Using VIIRS nighttime light imagery, we construct a set of image-based features at the country level and evaluate their behavior relative to existing instability measures.
+For our first objective, we critically reassessed grid instability being modeled as a binary outcome (stable vs. unstable), defined using a median split of next-year volatility and risking capturing persistence effects rather than meaningful structural differences in instability dynamics. To address this, we reformulated the prediction task as a multiclass classification problem, defining instability levels using quintiles of next-year volatility. This approach preserves the forecasting structure, features derived from year t and labels defined by outcomes in year t+1, while requiring the model to distinguish between degrees of instability rather than a single threshold crossing.
 
-The notebook in scripts/ processes nighttime light images for Three different Countries: 
+By predicting five ordered instability categories (very low to very high), the model is no longer rewarded merely for identifying persistent instability. It must learn patterns that differentiate moderate from extreme volatility, providing a stricter and more informative evaluation of the predictive value of nighttime light features. Interpretation of the updated models:
 
-Morocco (small–medium country with concentrated nightlight patterns), Brazil (large country with strong regional heterogeneity), China (very large country with high-density and saturated nightlight cores)
+Table 1. Updated Model Comparison
 
-Applying country masks to isolate national boundaries
+Table 1 and Figure 1 summarize model performance across feature sets and model classes under the multiclass formulation. Performance is evaluated using accuracy, macro F1, weighted F1, and class-specific F1 for the highest volatility category (class 4), which represents the most policy-relevant outcome. Overall performance is lower than in the binary setting, reflecting the increased difficulty of the task. This confirms that the multiclass formulation imposes a more demanding predictive challenge rather than inflating performance through persistence. 
 
-Computing average and total light intensity measures
+Model performance varies more meaningfully across feature sets. Logistic Regression performs competitively when limited to minimal temporal features, while Random Forest consistently shows superior performance as spatial heterogeneity features are introduced. This pattern suggests that non-linear interactions between temporal volatility and spatial dispersion are informative for distinguishing higher instability levels. External infrastructure covariates again fail to substantially improve performance, indicating that satellite-derived temporal and spatial patterns already encode much of the predictive signal captured by these coarse indicators.
 
-Normalizing intensity by country size to improve comparability
+Figure 1. Model Comparison Heatmap
 
-Visualizing nighttime light distributions and spatial patterns
+The strongest performance is achieved by the Random Forest model with spatial heterogeneity features (feature set C), indicating that how nighttime light dynamics are represented is more consequential than the inclusion of external covariates. Feature ablations further show that short-horizon electricity instability remains dominated by temporal persistence in light volatility, with lagged instability measures saturating predictive performance across specifications. The limited marginal contribution of infrastructure and access covariates therefore suggests that such variables primarily explain cross-sectional differences in energy development rather than year-to-year transitions, imposing a structural constraint on one-step-ahead forecasting.
 
-This analysis serves as a robustness and diagnostic check, testing whether image-derived features add information beyond autoregressive instability measures. The workflow is fully reproducible, with all cells executed and outputs displayed, and is designed to be easily extended to additional countries.
+Figure 2. Best Model Confusion Matrix
 
-## Week 4: Temporal Features, Forecasting, and Model Comparison
+Figure 2 presents the confusion matrix for the best-performing multiclass model. Predictions are most accurate along the diagonal, particularly for the highest volatility categories (classes 3 and 4). Misclassifications occur predominantly between adjacent classes rather than across distant categories, indicating that the model captures the ordinal structure of instability levels. Even when errors occur, the model typically predicts a nearby volatility state rather than confusing stable and highly unstable regimes, suggesting that it learns a graded notion of instability rather than collapsing predictions toward the mean.
 
-### Objective
+Figure 3. Random Forest Feature Importance
 
-Week 4 extends the baseline analysis by addressing key limitations identified in Week 3, particularly label circularity and the lack of temporal structure. The goal is to reformulate the task as a forecasting problem and to evaluate whether richer temporal representations of nighttime lights improve predictive performance.
+Feature importance analysis for the best RF model shows that temporal volatility measures remain the strongest predictors of future instability. In contrast to the binary formulation, spatial dispersion features contribute meaningfully in the multiclass setting. This shift indicates that spatial heterogeneity plays a substantive role in distinguishing degrees of instability once the prediction task moves beyond a binary threshold.
 
-### Data and Feature Engineering
+Pixel-Level Spatial Analysis of Nighttime Lights
 
-We construct a monthly country-level panel using VIIRS nighttime lights data accessed through Google Earth Engine. Monthly radiance values are aggregated into yearly country-level features, including mean, standard deviation, minimum, maximum, and range of monthly brightness. These features summarize both average illumination levels and temporal volatility within a year.
+Given the dominance of temporal persistence in short-horizon prediction, we next ask whether spatial structure offers complementary insight beyond what country-level forecasting can capture. Earlier results relied primarily on temporal autocorrelation, motivating an exploration of whether spatial patterns extracted from satellite imagery encode interpretable structure relevant to electricity instability.
 
-To avoid circularity, labels are defined using *next-year* volatility: features are computed from Year *t*, while the binary outcome indicates whether volatility in Year *t+1* exceeds the sample median. This transforms the task from descriptive classification into a genuine one-year-ahead forecasting problem.
+We exported annual GeoTIFF images (2014–2023) combining VIIRS nighttime lights (avg_rad) with population density from the WorldPop Global Population Density dataset (100 m resolution). Each image contains three aligned bands: nighttime radiance, raw population counts, and a normalized population mask. Key challenges included managing heavy-tailed radiance distributions, ensuring spatial consistency across years, and avoiding circularity when incorporating population information.
 
-### Model Comparison and Controlled Experiments
+To capture within-country structure, each country was partitioned into a fixed grid of subregions. For each region, we computed mean and variance of nighttime lights and population density, along with their within-region association. Regions were classified into interpretable typologies (urban cores, dense but dim regions, bright sparse areas, mixed regions, and rural or empty regions) based on joint thresholds of light intensity and population density. We chose Morocco as our case study because it is our lovely teammate Bouchra’s home.
+Spatial Structure in Morocco
+ 
+Figure 4. Regional population–nightlight typology for Morocco (2023). Colors represent urban cores, mixed regions, and rural areas, highlighting spatial inequality in development.
 
-We compare Logistic Regression and Random Forest classifiers to evaluate the role of model flexibility in capturing instability patterns. Logistic Regression serves as a linear baseline, while Random Forest allows for non-linear interactions and threshold effects.
+Figure 4 illustrates Morocco’s pronounced spatial inequality in 2023. Urban cores (high population, high luminosity) concentrate the vast majority of nighttime light, while rural and empty regions dominate land area but contribute negligible illumination. This polarized structure indicates a development pattern centered on intensifying existing hubs, with persistent “dense but dim” regions highlighting areas where population growth consistently outpaces infrastructure provision.
 
-Controlled experiments are conducted using incrementally expanded feature sets:
-- Minimal temporal summaries (mean and standard deviation)
-- Temporal summaries plus extrema and range
-- Optional spatial heterogeneity measures
-- Optional external infrastructure covariates
+Figure 5. Total nighttime light mass in Morocco (2014–2023), showing sustained growth driven by increased illumination intensity.
 
-All models are evaluated using a stratified 70/30 train–test split, with performance assessed via accuracy and class-specific F1 scores, focusing on the unstable class.
+Figure 6. Total Nighttime Lights.
 
-### Key Findings
+Figure 5 shows that total nighttime light mass increased steadily from 2014 to 2023, reflecting sustained national growth. Figure 6 reveals that this increase is driven by rising radiance within a largely stable lit area rather than spatial expansion. Together, these patterns indicate that Morocco’s development over the past decade has been characterized by electrical densification of established urban centers rather than broad-based electrification of new rural regions.
 
-Random Forest models consistently outperform Logistic Regression, particularly when extreme and range-based temporal features are included. Performance gains are driven primarily by volatility-related features rather than average brightness levels. External infrastructure covariates do not materially improve performance beyond satellite-derived features. These results suggest that fluctuations in nighttime illumination provide a meaningful early-warning signal for future electricity grid instability.
+Table 2. Morocco country–year feature table
 
-### Status
+The Morocco country–year feature table shows that image-derived temporal and spatial light features are internally consistent but highly persistent over time, with gradual changes in mean intensity and stable dispersion and inequality measures. This stability indicates that the feature set encodes durable spatial structure rather than transient noise, helping explain why short-horizon prediction is saturated by lagged volatility and why additional covariates yield limited marginal gains in robustness checks.
 
-Weeks 4 establish a complete modeling pipeline for forecasting electricity grid instability using satellite-derived nighttime lights. The project now includes monthly data aggregation, temporally informed feature engineering, a non-circular label definition based on next-year volatility, and systematic model comparison through controlled experiments. Results indicate that temporal variability and extreme fluctuations in nighttime lights are more informative than static brightness levels, providing a strong foundation for further validation and extension.
+Figure 7. Light Inequality by Population Quintile
+
+Quantile-based segmentation shows extreme concentration of nighttime lights, with the top 20% most populous regions capturing the vast majority of total luminosity. The lower population quintiles (0–60%) remain flat and near zero over time, statistically confirming that large segments of the population persist in relative “light poverty” despite aggregate national growth.
+
+Figure 9. Fixed-Threshold Population Nightlight Typology Over Time
+
+Longitudinal tracking of regional typologies from 2014 to 2023 reveals the structural rigidity of Morocco’s development. The share of regions classified as urban cores remains stable relative to total area, reinforcing the conclusion that growth is vertical (intensification) rather than horizontal (sprawl). The persistence of dense but dim regions provides a concrete metric of structural instability, highlighting areas where demographic pressure consistently exceeds infrastructure capacity.
 
 
 Authors: Nami, Bouchra, Amanda 
