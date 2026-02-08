@@ -3,6 +3,27 @@ Satellite-derived nighttime lights have become a widely used proxy for electrici
 
 Most existing studies focus on estimating electricity access levels or tracking long-run electrification progress. Fewer papers examine whether patterns in nightlight variability over time can be used to distinguish broadly stable from unstable electricity systems in a comparative, cross-country framework. This project builds on the established use of nighttime lights as an energy proxy while addressing this gap. Specifically, we ask whether patterns in nighttime satellite images can distinguish countries with relatively stable versus variable electricity-related lighting over time. We analyze monthly nighttime satellite imagery to construct country-level time series of light intensity and extract summary measures of temporal variability. Using a binary classification framework, we assess whether these patterns differ systematically across countries, without attributing observed differences to specific causes.
 
+
+## Week 5 :  Robustness and sensitivity checks
+
+Image-Based Feature Engineering
+
+This week focuses on incorporating satellite image data as a robustness check and diagnostic tool for the project. Using VIIRS nighttime light imagery, we construct a set of image-based features at the country level and evaluate their behavior relative to existing instability measures.
+
+The notebook in scripts/ processes nighttime light images for Three different Countries: 
+
+Morocco (small–medium country with concentrated nightlight patterns), Brazil (large country with strong regional heterogeneity), China (very large country with high-density and saturated nightlight cores)
+
+Applying country masks to isolate national boundaries
+
+Computing average and total light intensity measures
+
+Normalizing intensity by country size to improve comparability
+
+Visualizing nighttime light distributions and spatial patterns
+
+This analysis serves as a robustness and diagnostic check, testing whether image-derived features add information beyond autoregressive instability measures. The workflow is fully reproducible, with all cells executed and outputs displayed, and is designed to be easily extended to additional countries.
+
 ## Week 4: Temporal Features, Forecasting, and Model Comparison
 
 ### Objective
