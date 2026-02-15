@@ -1,0 +1,86 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as smf
+import numpy as np
+import os
+
+# ==========================================
+# 1. SETUP
+# ==========================================
+BASE_PATH = r"C:\Users\amimi\OneDrive - Duke University\SCHOOL\SPRING 2026\STATS201\Week 6 Files\STATS201-Course-project\figures\week6_outputs"
+COUNTRIES = ["Brazil", "China", "Morocco"]
+YEAR = 2023
+
+# We will build a text summary to render as a table
+table_data = []
+
+print(f"🚀 Generating Summary Table for {YEAR}...\n")
+
+for country in COUNTRIES:
+    filename = f"tiles_{country}_{YEAR}.csv"
+    file_path = os.path.join(BASE_PATH, filename)
+    
+    if not os.path.exists(file_path):
+        continue
+
+    # Load & Prep
+    df = pd.read_csv(file_path)
+    pop_col = 'sum_pop' if 'sum_pop' in df.columns else 'mean_pop'
+    df['log_pop'] = np.log1p(df[pop_col])
+    df['log_light'] = np.log1p(df['mean_light'])
+    
+    # Run Baseline Model
+    formula = "log_light ~ log_pop + C(region_type) + log_pop:C(region_type)"
+    model = smf.ols(formula=formula, data=df).fit()
+    
+    # Extract Key Metrics
+    r2 = f"{model.rsquared:.3f}"
+    n_obs = f"{int(model.nobs):,}"
+    
+    # Get the "Urban Core" Slope (Example of a key coefficient)
+    # We look for the interaction term specific to urban_core
+    urban_slope = "N/A"
+    for term in model.params.index:
+        if "log_pop:C(region_type)" in term and "urban_core" in term:
+            coef = model.params[term]
+            pval = model.pvalues[term]
+            stars = "***" if pval < 0.001 else "**" if pval < 0.01 else "*" if pval < 0.05 else ""
+            urban_slope = f"{coef:.3f}{stars}"
+    
+    # Get the "Rural" Slope (Reference category usually, or explicit)
+    # This depends on your reference level, but let's grab the 'log_pop' main effect
+    # which usually represents the reference group (often Empty/Rural)
+    rural_slope_val = model.params['log_pop']
+    rural_pval = model.pvalues['log_pop']
+    rural_stars = "***" if rural_pval < 0.001 else "**" if rural_pval < 0.01 else "*" if rural_pval < 0.05 else ""
+    rural_slope = f"{rural_slope_val:.3f}{rural_stars}"
+
+    table_data.append([country, r2, n_obs, rural_slope, urban_slope])
+
+# ==========================================
+# 2. RENDER TABLE AS IMAGE
+# ==========================================
+columns = ["Country", "R-Squared", "N Observations", "Rural Elasticity", "Urban Elasticity"]
+df_table = pd.DataFrame(table_data, columns=columns)
+
+fig, ax = plt.subplots(figsize=(10, 3)) # Short and wide
+ax.axis('tight')
+ax.axis('off')
+
+# Create the table
+the_table = ax.table(
+    cellText=df_table.values,
+    colLabels=df_table.columns,
+    loc='center',
+    cellLoc='center'
+)
+
+# Formatting
+the_table.auto_set_font_size(False)
+the_table.set_fontsize(12)
+the_table.scale(1.2, 2) # Adjust spacing
+
+plt.title(f"Baseline Regression Results ({YEAR})\nDependent Variable: Log(Nighttime Lights)", pad=20)
+plt.savefig("regression_summary_table_2023.png", dpi=300, bbox_inches='tight')
+print("✅ Saved table image: regression_summary_table_2023.png")
+plt.show()
