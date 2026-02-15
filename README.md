@@ -3,7 +3,7 @@ Satellite-derived nighttime lights have become a widely used proxy for electrici
 
 Most existing studies focus on estimating electricity access levels or tracking long-run electrification progress. Fewer papers examine whether patterns in nightlight variability over time can be used to distinguish broadly stable from unstable electricity systems in a comparative, cross-country framework. This project builds on the established use of nighttime lights as an energy proxy while addressing this gap. Specifically, we ask whether patterns in nighttime satellite images can distinguish countries with relatively stable versus variable electricity-related lighting over time. We analyze monthly nighttime satellite imagery to construct country-level time series of light intensity and extract summary measures of temporal variability. Using a binary classification framework, we assess whether these patterns differ systematically across countries, without attributing observed differences to specific causes.
 
-###Week 6 Updates 
+## Week 6 Updates 
 This week consolidates the core statistical framework and completes the spatial data pipeline required for the final project. We finalized the tile-level panel dataset (2014–2023) across Morocco, Brazil, and China (30,442 tile-year observations) and implemented the interaction log–log OLS specification:
 
 log(light) ~ log(population) + region + region × log(population)
