@@ -1,0 +1,6 @@
+Model,R²,Adj_R²,ΔR²_vs_Pop,N_obs
+1. Pop only,0.6516,0.6440,0.0000,48
+2. Pop + Distance to urban,0.8057,0.7971,0.1541,48
+3. Pop + Local urban density,0.8194,0.8114,0.1678,48
+4. Pop + Centrality,0.7031,0.6899,0.0515,48
+5. Pop + Distance + Density,0.8262,0.8144,0.1747,48
