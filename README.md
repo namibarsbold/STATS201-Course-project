@@ -93,10 +93,51 @@ jupyter notebook notebooks/FINAL_REPORT.ipynb
 
 ## How to Get the Data
 
-| Dataset | Source | Access |
-|---------|--------|--------|
-| VIIRS Nighttime Lights (annual composites) | NASA LAADS DAAC | https://ladsweb.modaps.eosdis.nasa.gov — search for VNP46A3 / VNP46A4 products |
-| WorldPop population rasters (1 km, annual) | WorldPop Hub | https://www.worldpop.org — download 100m or 1km unconstrained grids |
-| OpenStreetMap infrastructure (roads, power lines) | Geofabrik | https://download.geofabrik.de — select country extracts in PBF or SHP format |
+| Dataset | Format | Source | Access |
+|---------|--------|--------|--------|
+| VIIRS Nighttime Lights — annual GeoTIFF rasters (Brazil, China, Morocco 2014–2023) | `.tif` | Google Earth Engine (GEE) | Run the GEE JavaScript snippet below → Export to Google Drive → place files in `data/week_5_robustness_tif_images/` |
+| VIIRS Nighttime Lights — country-level CSV panel | `.csv` | Derived from GEE exports | Already in `data/processed/` |
+| WorldPop population rasters (1 km, annual) | `.tif` | WorldPop Hub | https://www.worldpop.org — download 100m or 1km unconstrained grids |
+| OpenStreetMap infrastructure (roads, power lines) | `.pbf` / `.shp` | Geofabrik | https://download.geofabrik.de — select country extracts |
 
-Place raw data files under `data/` before running the pipeline scripts.
+### VIIRS extraction via Google Earth Engine
+
+The annual VIIRS GeoTIFF rasters were exported using a **Google Earth Engine JavaScript script**. The original script is no longer available, but to reproduce the exports:
+
+1. Go to https://code.earthengine.google.com
+2. Use the following template (adjust `country`, `year`, and geometry as needed):
+
+```javascript
+// VIIRS Annual Composite Export — Google Earth Engine
+var year = 2020;
+var country = 'Morocco';  // change to 'Brazil' or 'China'
+
+// Define country geometry (draw or use FAO GAUL)
+var geometry = ee.FeatureCollection('FAO/GAUL/2015/level0')
+                 .filter(ee.Filter.eq('ADM0_NAME', country))
+                 .geometry();
+
+// Load VIIRS monthly composites and compute annual mean
+var viirs = ee.ImageCollection('NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG')
+              .filterDate(year + '-01-01', (year + 1) + '-01-01')
+              .select('avg_rad')
+              .mean()
+              .clip(geometry);
+
+// Export to Google Drive
+Export.image.toDrive({
+  image: viirs,
+  description: country + '_' + year,
+  folder: 'VIIRS_exports',
+  fileNamePrefix: country + '_' + year,
+  region: geometry,
+  scale: 500,
+  crs: 'EPSG:4326',
+  maxPixels: 1e13
+});
+```
+
+3. Click **Run**, then **Tasks** tab → click **Run** next to the export task
+4. Download the `.tif` from Google Drive and place it in `data/week_5_robustness_tif_images/`
+
+Place all raw data files under `data/` before running the pipeline scripts.
