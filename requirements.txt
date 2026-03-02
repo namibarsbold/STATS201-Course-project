@@ -1,0 +1,15 @@
+numpy
+pandas
+matplotlib
+seaborn
+rasterio
+geopandas
+scipy
+statsmodels
+jupyter
+scikit-learn
+shapely
+pyproj
+fiona
+tqdm
+openpyxl
