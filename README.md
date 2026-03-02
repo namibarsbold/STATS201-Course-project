@@ -23,7 +23,7 @@ STATS201-Course-project/
 ├── data/
 │   ├── processed/          # Cleaned panel CSVs (VIIRS country panel)
 │   ├── monthly_viirs/      # Raw monthly VIIRS feature/label files
-│   └── week_5_robustness_tif_images/  # Morocco annual GeoTIFF rasters
+│   └── week_5_robustness_tif_images/  # Morocco GeoTIFF rasters (Brazil & China excluded — see note below)
 ├── notebooks/
 │   ├── FINAL_REPORT.ipynb  # Final report notebook (authoritative)
 │   ├── Week_2_Preliminary_Model.ipynb
@@ -95,7 +95,8 @@ jupyter notebook notebooks/FINAL_REPORT.ipynb
 
 | Dataset | Format | Source | Access |
 |---------|--------|--------|--------|
-| VIIRS Nighttime Lights — annual GeoTIFF rasters (Brazil, China, Morocco 2014–2023) | `.tif` | Google Earth Engine (GEE) | Run the GEE JavaScript snippet below → Export to Google Drive → place files in `data/week_5_robustness_tif_images/` |
+| VIIRS Nighttime Lights — Morocco GeoTIFF rasters (2014–2023) | `.tif` | Google Earth Engine (GEE) | Already in `data/week_5_robustness_tif_images/` |
+| VIIRS Nighttime Lights — Brazil & China GeoTIFF rasters (2014–2023) | `.tif` | Google Earth Engine (GEE) | **Not included** — files are 241–394 MB each, exceeding GitHub's 100 MB limit. Re-export using the GEE script below and place in `data/week_5_robustness_tif_images/` |
 | VIIRS Nighttime Lights — country-level CSV panel | `.csv` | Derived from GEE exports | Already in `data/processed/` |
 | WorldPop population rasters (1 km, annual) | `.tif` | WorldPop Hub | https://www.worldpop.org — download 100m or 1km unconstrained grids |
 | OpenStreetMap infrastructure (roads, power lines) | `.pbf` / `.shp` | Geofabrik | https://download.geofabrik.de — select country extracts |
