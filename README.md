@@ -2,7 +2,7 @@
 
 A machine-learning panel study that uses VIIRS nighttime-light tiles, population rasters, and OpenStreetMap infrastructure data to model and explain electrification inequality across three middle-income countries over a decade.
 
-**GitHub Pages:** https://namibarsbold.github.io/STATS201-Course-project/
+**HTML Psge Link:** https://namibarsbold.github.io/STATS201-Course-project/
 
 ---
 
