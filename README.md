@@ -12,7 +12,7 @@ A machine-learning panel study that uses VIIRS nighttime-light tiles, population
 |------|------|
 | Namibarsbold | Editing, Interpretation, Data Visualization |
 | Amanda | Editing, Interpretation, Data Visualization |
-| Bouchra | Data Analysis and Model Designer |
+| Bouchra | Data Analyst and Model Designer |
 
 ---
 
