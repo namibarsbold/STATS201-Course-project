@@ -38,7 +38,7 @@ STATS201-Course-project/
 │   └── week7_*.py
 ├── figures/                # All output figures organized by week/stage
 ├── docs/
-│   └── index.html          # GitHub Pages report webpage
+│   └── index.html          # GitHub Pages report (generated from FINAL_REPORT.ipynb)
 ├── requirements.txt
 └── README.md
 ```
@@ -85,8 +85,13 @@ python scripts/final_regression.py
 python scripts/week7_final_regressiontable.py
 python scripts/week7_final_scatterplots.py
 
-# Step 6 — Open final report notebook
+# Step 6 — Open and edit the final report notebook
 jupyter notebook notebooks/FINAL_REPORT.ipynb
+
+# Step 7 — Regenerate the GitHub Pages HTML from the notebook
+# Run this after filling in content and re-running all cells in the notebook:
+jupyter nbconvert --to html --execute notebooks/FINAL_REPORT.ipynb \
+    --output index.html --output-dir docs/
 ```
 
 ---
